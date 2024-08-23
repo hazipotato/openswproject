@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        async function runMakeRect() {
+            try {
+                let response = await fetch('/run_make_rect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                let data = await response.json();
+
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    // Enable the "Get Problem" button after running make_rect.py
+                    document.getElementById('get-problem-button').style.display = 'inline';
+                }
+            } catch (error) {
+                alert('An error occurred: ' + error);
+            }
+        }
+
+        async function getProblem() {
+            try {
+                let response = await fetch('/get_problem', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                let data = await response.json();
+
+                if (data.error) {
+                    document.getElementById('problem-output').innerHTML = 'Error: ' + data.error;
+                    document.getElementById('solution-button').style.display = 'none'; // Hide the button if there's an error
+                } else {
+                    document.getElementById('problem-output').innerHTML = 
+                        '문제:<br>' + (data.problem_output || '');
+                    
+                    // Show the solution button if a solution is available
+                    document.getElementById('solution-button').style.display = data.solution_available ? 'inline' : 'none';
+                    
+                    // MathJax 재렌더링
+                    MathJax.typeset();
+                }
+            } catch (error) {
+                document.getElementById('problem-output').innerHTML = 'An error occurred: ' + error;
+            }
+        }
+
+        async function showSolution() {
+            try {
+                let response = await fetch('/get_solution', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                let data = await response.json();
+
+                // Show solution in a popup
+                alert('해설:\n' + (data.solution_output || data.error || 'No solution available.'));
+            } catch (error) {
+                alert('An error occurred: ' + error);
+            }
+        }
+
+        // Fetch problem when page loads
+        window.onload = function() {
+            document.getElementById('get-problem-button').style.display = 'none';
+            document.getElementById('solution-button').style.display = 'none';
+        };
+    </script>
+</head>
+<body>
+    <h2>안녕하세요, {{ username }}님!</h2>
+    <p>문제를 만들고 공부하세요</p>
+    <button onclick="runMakeRect()">문제 만들기</button>
+    <button id="get-problem-button" onclick="getProblem()" style="display:none;">문제 가져오기</button>
+    <button id="solution-button" onclick="showSolution()" style="display:none;">해설 보기</button>
+    <div id="problem-output"></div>
+    <pre id="error-output"></pre>
+    <a href="{{ url_for('logout') }}">로그아웃</a>
+</body>
+</html>

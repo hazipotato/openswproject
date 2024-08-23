@@ -1,0 +1,4 @@
+다음을 계산하시오.
+\left(\mathcal{y}-84\right)+\left(\mathcal{56}\mathcal{x}+65\right)
+
+위 문제의 풀이를 알려줘. 알려준 풀이에서 LaTeX 수식 언어로 출력하는 부분은 인코딩 할 수 있도록 $$로 감싸서 출력해줘
