@@ -125,7 +125,6 @@ for i in range(len(parts)-1):
         parts[i] = remove_spaces(parts[i])
         spacing = Spacing()
         parts[i] = spacing(parts[i])
-        print(parts[i], "\n\n\n")
 
 # HTML로 수식 변환
 def convert_latex_to_html(latex_str):
@@ -145,4 +144,13 @@ with open('mun.txt', 'w', encoding='utf-8') as file:
 with open('mun.txt', 'r', encoding='utf-8') as file:
     content = file.read()
 
-print(convert_latex_to_html(new_equ))
+with open('new_equ.txt', 'w', encoding='utf-8') as file:
+    for i in range(len(parts)-1):
+        if contains_korean(parts[i]):
+            file.write(parts[i] + '\n')
+    file.write(convert_latex_to_html(new_equ))
+
+with open ('new_equ.txt', 'r', encoding='utf-8') as file:
+    content = file.read()
+    print(content)
+

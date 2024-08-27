@@ -105,7 +105,6 @@ def get_problem():
             stdout=subprocess.PIPE, 
             stderr=subprocess.PIPE, 
             text=True, 
-            encoding='utf-8',  # 인코딩 설정
             check=True
         )
         logging.debug(f"make_prob.py output: {result_prob.stdout}, error: {result_prob.stderr}")
@@ -141,7 +140,6 @@ def get_solution():
                 stdout=subprocess.PIPE, 
                 stderr=subprocess.PIPE, 
                 text=True, 
-                encoding='utf-8',  # 인코딩 설정
                 check=True
             )
             logging.debug(f"make_sol.py output: {result_sol.stdout}, error: {result_sol.stderr}")
