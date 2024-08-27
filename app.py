@@ -75,54 +75,60 @@ def register():
 
     return render_template('register.html')
 
-@app.route('/home', methods=['GET', 'POST'])
+@app.route('/home', methods=['GET'])
 def home():
     if 'username' in session:
-        if request.method == 'POST':
-            try:
-                # Execute make_rect.py
-                logging.debug("Running make_rect.py")
-                subprocess.run(['python', 'make_rect.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
-                
-                # Execute make_prob.py
-                logging.debug("Running make_prob.py")
-                result_prob = subprocess.run(
-                    ['python', 'make_prob.py'], 
-                    stdout=subprocess.PIPE, 
-                    stderr=subprocess.PIPE, 
-                    text=True, 
-                    encoding='utf-8',  # 인코딩 설정
-                    check=True
-                )
-                logging.debug(f"make_prob.py output: {result_prob.stdout}, error: {result_prob.stderr}")
-
-                # Return the problem output in JSON format
-                return jsonify({
-                    'problem_output': result_prob.stdout,
-                    'stderr': result_prob.stderr,
-                    'solution_available': True
-                })
-                
-            except subprocess.CalledProcessError as e:
-                logging.error(f"Subprocess error: {e.stderr}")
-                return jsonify({
-                    'error': f"Subprocess error: {e.stderr}",
-                    'solution_available': False
-                })
-            except FileNotFoundError as e:
-                logging.error(f"File not found: {e}")
-                return jsonify({
-                    'error': str(e),
-                    'solution_available': False
-                })
-            except Exception as e:
-                logging.error(f"General error: {e}")
-                return jsonify({
-                    'error': str(e),
-                    'solution_available': False
-                })
         return render_template('home.html', username=session['username'])
     return redirect(url_for('login'))
+
+@app.route('/run_make_rect', methods=['POST'])
+def run_make_rect():
+    try:
+        # Execute make_rect.py
+        logging.debug("Running make_rect.py")
+        subprocess.run(['python', 'make_rect.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+        return jsonify({'status': 'success'})
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Subprocess error: {e.stderr}")
+        return jsonify({'error': f"Subprocess error: {e.stderr}"})
+    except Exception as e:
+        logging.error(f"General error: {e}")
+        return jsonify({'error': str(e)})
+
+@app.route('/get_problem', methods=['POST'])
+def get_problem():
+    try:
+        # Execute make_prob.py
+        logging.debug("Running make_prob.py")
+        result_prob = subprocess.run(
+            ['python', 'make_prob.py'], 
+            stdout=subprocess.PIPE, 
+            stderr=subprocess.PIPE, 
+            text=True, 
+            encoding='utf-8',  # 인코딩 설정
+            check=True
+        )
+        logging.debug(f"make_prob.py output: {result_prob.stdout}, error: {result_prob.stderr}")
+
+        # Return the problem output in HTML format
+        return jsonify({
+            'problem_output': result_prob.stdout,
+            'stderr': result_prob.stderr,
+            'solution_available': True
+        })
+        
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Subprocess error: {e.stderr}")
+        return jsonify({
+            'error': f"Subprocess error: {e.stderr}",
+            'solution_available': False
+        })
+    except Exception as e:
+        logging.error(f"General error: {e}")
+        return jsonify({
+            'error': str(e),
+            'solution_available': False
+        })
 
 @app.route('/get_solution', methods=['POST'])
 def get_solution():
@@ -140,7 +146,7 @@ def get_solution():
             )
             logging.debug(f"make_sol.py output: {result_sol.stdout}, error: {result_sol.stderr}")
 
-            # Return the solution output in JSON format
+            # Return the solution output in HTML format
             return jsonify({
                 'solution_output': result_sol.stdout,
                 'stderr': result_sol.stderr
@@ -151,17 +157,13 @@ def get_solution():
             return jsonify({
                 'error': f"Subprocess error: {e.stderr}"
             })
-        except FileNotFoundError as e:
-            logging.error(f"File not found: {e}")
-            return jsonify({
-                'error': str(e)
-            })
         except Exception as e:
             logging.error(f"General error: {e}")
             return jsonify({
                 'error': str(e)
             })
     return redirect(url_for('login'))
+
 
 @app.route('/logout')
 def logout():

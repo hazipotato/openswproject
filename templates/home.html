@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>
         async function runMakeRect() {
             try {
@@ -45,9 +44,6 @@
                     
                     // Show the solution button if a solution is available
                     document.getElementById('solution-button').style.display = data.solution_available ? 'inline' : 'none';
-                    
-                    // MathJax 재렌더링
-                    MathJax.typeset();
                 }
             } catch (error) {
                 document.getElementById('problem-output').innerHTML = 'An error occurred: ' + error;
@@ -70,7 +66,6 @@
             }
         }
 
-        // Fetch problem when page loads
         window.onload = function() {
             document.getElementById('get-problem-button').style.display = 'none';
             document.getElementById('solution-button').style.display = 'none';
@@ -81,10 +76,9 @@
     <h2>안녕하세요, {{ username }}님!</h2>
     <p>문제를 만들고 공부하세요</p>
     <button onclick="runMakeRect()">문제 만들기</button>
-    <button id="get-problem-button" onclick="getProblem()" style="display:none;">문제 가져오기</button>
-    <button id="solution-button" onclick="showSolution()" style="display:none;">해설 보기</button>
+    <button id="get-problem-button" onclick="getProblem()">문제 가져오기</button>
+    <button id="solution-button" onclick="showSolution()">해설 보기</button>
     <div id="problem-output"></div>
-    <pre id="error-output"></pre>
     <a href="{{ url_for('logout') }}">로그아웃</a>
 </body>
 </html>
