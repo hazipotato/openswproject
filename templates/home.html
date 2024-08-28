@@ -5,8 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <style>
+        /* 로딩 스피너 스타일 */
+        #loading-spinner {
+            display: none; /* 처음에는 보이지 않도록 설정 */
+            position: fixed;
+            left: 200px;
+            top: 200px;
+            width: 40px;
+            height: 40px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 1000; /* 스피너가 다른 요소 위에 표시되도록 설정 */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
     <script>
+        // 로딩 스피너 표시
+        function showLoadingSpinner() {
+            document.getElementById('loading-spinner').style.display = 'block';
+        }
+
+        // 로딩 스피너 숨기기
+        function hideLoadingSpinner() {
+            document.getElementById('loading-spinner').style.display = 'none';
+        }
+
         async function runMakeRect() {
+            showLoadingSpinner(); // 로딩 스피너 표시
             try {
                 let response = await fetch('/run_make_rect', {
                     method: 'POST',
@@ -23,10 +55,13 @@
                 }
             } catch (error) {
                 alert('An error occurred: ' + error);
+            } finally {
+                hideLoadingSpinner(); // 요청 완료 후 로딩 스피너 숨기기
             }
         }
 
         async function getProblem() {
+            showLoadingSpinner(); // 로딩 스피너 표시
             try {
                 let response = await fetch('/get_problem', {
                     method: 'POST',
@@ -47,10 +82,13 @@
                 }
             } catch (error) {
                 document.getElementById('problem-output').innerHTML = 'An error occurred: ' + error;
+            } finally {
+                hideLoadingSpinner(); // 요청 완료 후 로딩 스피너 숨기기
             }
         }
 
         async function showSolution() {
+            showLoadingSpinner(); // 로딩 스피너 표시
             try {
                 let response = await fetch('/get_solution', {
                     method: 'POST',
@@ -63,6 +101,8 @@
                 alert('해설:\n' + (data.solution_output || data.error || 'No solution available.'));
             } catch (error) {
                 alert('An error occurred: ' + error);
+            } finally {
+                hideLoadingSpinner(); // 요청 완료 후 로딩 스피너 숨기기
             }
         }
 
@@ -79,6 +119,7 @@
     <button id="get-problem-button" onclick="getProblem()">문제 가져오기</button>
     <button id="solution-button" onclick="showSolution()">해설 보기</button>
     <div id="problem-output"></div>
+    <div id="loading-spinner"></div> <!-- 로딩 스피너 -->
     <a href="{{ url_for('logout') }}">로그아웃</a>
 </body>
 </html>
